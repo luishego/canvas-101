@@ -1,0 +1,3 @@
+[submodule "canvas-gravity-simulator"]
+	path = canvas-gravity-simulator
+	url = https://github.com/christopher4lis/canvas-boilerplate.git
