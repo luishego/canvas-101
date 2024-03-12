@@ -2,57 +2,43 @@ let canvas = document.querySelector("canvas");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let circleArr = [];
+let mouse = {
+  x: undefined,
+  y: undefined,
+};
+
 const c = canvas.getContext("2d");
+const maxRadius = 40;
+const colorArr = ["#295880", "#547999", "#7f9bb3", "#a9bccc", "#a9bccc"];
 
-//drawing a rectangle
-// c.fillStyle = "rgba(255, 0, 0, 0.5)";
-// c.fillRect(100, 100, 100, 100);
-// c.fillStyle = "rgba(0, 0, 255, 0.5)";
-// c.fillRect(400, 100, 100, 100);
-// c.fillStyle = "rgba(0, 255, 0, 0.5)";
-// c.fillRect(300, 300, 100, 100);
+window.addEventListener("mousemove", (event) => {
+  mouse.x = event.x;
+  mouse.y = event.y;
+});
 
-//drawing a line
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-// c.beginPath();
-// c.moveTo(50, 300);
-// c.lineTo(300, 100);
-// c.lineTo(400, 300);
-// c.strokeStyle = "#fa34a3";
-// c.stroke();
-
-//Drawing an Arc or circle
-// c.beginPath();
-// c.arc(300, 300, 30, 0, Math.PI * 2, false);
-// c.strokeStyle = "blue";
-// c.stroke();
-
-//Multiple cicles
-
-// for(let i = 0; i < 100; i++) {
-//     const x = Math.random()*window.innerWidth;
-//     const y = Math.random()*window.innerHeight;
-//     c.beginPath();
-//     c.arc(x, y, 30, 0, Math.PI * 2, false);
-//     c.strokeStyle = 'blue';
-//     c.stroke();
-
-// }
+});
 
 class Circle {
-  constructor(x, y, radius, dx, dy) {
+  constructor({ x, y, dx, dy, radius }) {
     this.x = x;
     this.y = y;
     this.dx = dx;
     this.dy = dy;
     this.radius = radius;
+    this.minRadius = radius;
+    this.color = colorArr[Math.floor(Math.random() * colorArr.length)];
   }
 
   draw = () => {
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    c.strokeStyle = "blue";
-    c.stroke();
+    c.fillStyle = this.color;
+    c.fill();
   };
 
   update = () => {
@@ -65,18 +51,39 @@ class Circle {
     this.x += this.dx;
     this.y += this.dy;
 
+    // adding interactivity
+
+    if (
+      mouse.x - this.x < 60 &&
+      mouse.x - this.x > -60 &&
+      mouse.y - this.y < 60 &&
+      mouse.y - this.y > -60
+    ) {
+      if (this.radius < maxRadius) {
+        this.radius += 1;
+      }
+    } else if (this.radius > this.minRadius) {
+      this.radius -= 1;
+    }
+
     this.draw();
   };
 }
 
-let circleArr = [];
-for (let i = 0; i < 100; i++) {
-  let radius = 30;
-  let x = Math.random() * (innerWidth - radius * 2) + radius;
-  let dx = (Math.random() - 0.5) * 5;
-  let y = Math.random() * (innerHeight - radius * 2) + radius;
-  let dy = (Math.random() - 0.5) * 5;
-  circleArr.push(new Circle(x, y, radius, dx, dy));
+const init = () => {
+  circleArr = []
+  for (let i = 0; i < 300; i++) {
+    let radius = Math.floor(Math.random() * 30 + 1);
+    let circleProperties = {
+      x: Math.random() * (innerWidth - radius * 2) + radius,
+      y: Math.random() * (innerHeight - radius * 2) + radius,
+      dx: (Math.random() - 0.5) * 5,
+      dy: (Math.random() - 0.5) * 5,
+      radius,
+    };
+    circleArr.push(new Circle(circleProperties));
+  }
+
 }
 const animate = () => {
   requestAnimationFrame(animate);
@@ -85,4 +92,5 @@ const animate = () => {
     circleArr[index].update();
   }
 };
+init();
 animate();
